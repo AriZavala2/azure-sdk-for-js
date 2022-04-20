@@ -51,7 +51,12 @@ const sanitizerOptions: SanitizerOptions = {
   generalSanitizers: [
     { regex: true, target: `"token"\\s?:\\s?"[^"]*"`, value: `"token":"sanitized"` },
     { regex: true, target: `"id"\\s?:\\s?"[^"]*"`, value: `"id":"sanitized"` },
-    { regex: true, target: `"expiresOn"\s?:\s?"[^"]*"`, value: `"expiresOn":"2022-05-18T12:00:00.00+00:00"` },
+    {
+      regex: true,
+      target: `"expiresOn"\s?:\s?"[^"]*"`,
+      value: `"expiresOn":"2022-05-18T12:00:00.00+00:00"`,
+    },
+    { regex: true, target: `"(turn|stun):[^"]*"`, value: `"turn.skype.com"` },
     { regex: true, target: `"username"\\s?:\\s?"[^"]*"`, value: `"username":"sanitized_username"` },
     {
       regex: true,
@@ -64,9 +69,6 @@ const sanitizerOptions: SanitizerOptions = {
       value: `sanitized`,
     },
   ],
-  // bodyKeySanitizers: [
-  //   { jsonPath: "$.iceServers[*].urls[*]", regex: ".*", value: "turn.skype.com" },
-  // ],
 };
 
 const recorderOptions: RecorderStartOptions = {
