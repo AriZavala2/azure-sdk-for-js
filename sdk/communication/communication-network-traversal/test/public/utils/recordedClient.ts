@@ -15,9 +15,11 @@ import { CommunicationRelayClient } from "../../../src";
 import { parseConnectionString } from "@azure/communication-common";
 import { TokenCredential } from "@azure/core-auth";
 import { createTestCredential } from "@azure-tools/test-credential";
+import { CommunicationIdentityClient } from "@azure/communication-identity";
 
-export interface RecordedClient<T> {
-  client: T;
+export interface RecordedClient {
+  identityClient: CommunicationIdentityClient;
+  relayClient: CommunicationRelayClient;
   recorder: Recorder;
 }
 
@@ -85,9 +87,13 @@ export async function createRecorder(context: Test | undefined): Promise<Recorde
 
 export async function createRecordedCommunicationRelayClient(
   context: Context
-): Promise<RecordedClient<CommunicationRelayClient>> {
+): Promise<RecordedClient> {
   const recorder = await createRecorder(context.currentTest);
 
+  const identityClient = new CommunicationIdentityClient(
+    env.COMMUNICATION_LIVETEST_DYNAMIC_CONNECTION_STRING ?? "",
+    recorder.configureClientOptions({})
+  );
   const client = new CommunicationRelayClient(
     env.COMMUNICATION_LIVETEST_DYNAMIC_CONNECTION_STRING ?? "",
     recorder.configureClientOptions({})
@@ -95,14 +101,15 @@ export async function createRecordedCommunicationRelayClient(
 
   // casting is a workaround to enable min-max testing
   return {
-    client,
+    identityClient,
+    relayClient: client,
     recorder,
   };
 }
 
 export async function createRecordedCommunicationRelayClientWithToken(
   context: Context
-): Promise<RecordedClient<CommunicationRelayClient>> {
+): Promise<RecordedClient> {
   const recorder = await createRecorder(context.currentTest);
 
   let credential: TokenCredential;
@@ -118,6 +125,11 @@ export async function createRecordedCommunicationRelayClientWithToken(
   } else {
     credential = createTestCredential();
   }
+  const identityClient = new CommunicationIdentityClient(
+    endpoint,
+    credential,
+    recorder.configureClientOptions({})
+  );
 
   const client = new CommunicationRelayClient(
     endpoint,
@@ -125,5 +137,9 @@ export async function createRecordedCommunicationRelayClientWithToken(
     recorder.configureClientOptions({})
   );
 
-  return { client, recorder };
+  return {
+    identityClient,
+    relayClient: client,
+    recorder,
+  };
 }
