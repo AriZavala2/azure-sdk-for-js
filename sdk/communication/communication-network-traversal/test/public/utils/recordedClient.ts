@@ -49,14 +49,23 @@ const sanitizerOptions: SanitizerOptions = {
   generalSanitizers: [
     { regex: true, target: `"token"\\s?:\\s?"[^"]*"`, value: `"token":"sanitized"` },
     { regex: true, target: `"id"\\s?:\\s?"[^"]*"`, value: `"id":"sanitized"` },
+    { regex: true, target: `"username"\\s?:\\s?"[^"]*"`, value: `"username":"sanitized_username"` },
+    {
+      regex: true,
+      target: `"credential"\\s?:\\s?"[^"]*"`,
+      value: `"credential":"sanitized_credential"`,
+    },
     {
       regex: true,
       target: `[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}`,
       value: `sanitized`,
     },
   ],
+  // bodyKeySanitizers: [
+  //   { jsonPath: "$.iceServers[*].urls[*]", regex: ".*", value: "turn.skype.com" },
+  // ],
 };
-  
+
 const recorderOptions: RecorderStartOptions = {
   envSetupForPlayback,
   sanitizerOptions: sanitizerOptions,
@@ -78,12 +87,12 @@ export async function createRecordedCommunicationRelayClient(
   context: Context
 ): Promise<RecordedClient<CommunicationRelayClient>> {
   const recorder = await createRecorder(context.currentTest);
-  
+
   const client = new CommunicationRelayClient(
     env.COMMUNICATION_LIVETEST_DYNAMIC_CONNECTION_STRING ?? "",
     recorder.configureClientOptions({})
   );
-  
+
   // casting is a workaround to enable min-max testing
   return {
     client,
@@ -106,7 +115,6 @@ export async function createRecordedCommunicationRelayClientWithToken(
         return { token: "testToken", expiresOnTimestamp: 11111 };
       },
     };
-
   } else {
     credential = createTestCredential();
   }

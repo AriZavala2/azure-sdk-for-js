@@ -8,9 +8,7 @@ import {
 } from "@azure/communication-common";
 import { isTokenCredential, KeyCredential, TokenCredential } from "@azure/core-auth";
 import { SpanStatusCode } from "@azure/core-tracing";
-import {
-  NetworkRelayRestClient,
-} from "./generated/src/networkRelayRestClient";
+import { NetworkRelayRestClient } from "./generated/src/networkRelayRestClient";
 import { InternalClientPipelineOptions } from "@azure/core-client";
 import { logger } from "./common/logger";
 import { createSpan } from "./common/tracing";
@@ -84,7 +82,7 @@ export class CommunicationRelayClient {
       ? credentialOrOptions
       : maybeOptions;
 
-    const internalPipelineOptions: InternalClientPipelineOptions  = {
+    const internalPipelineOptions: InternalClientPipelineOptions = {
       ...options,
       ...{
         loggingOptions: {
@@ -92,10 +90,10 @@ export class CommunicationRelayClient {
         },
       },
     };
-    
+
     this.client = new NetworkRelayRestClient(url, {
       endpoint: url,
-      ...internalPipelineOptions
+      ...internalPipelineOptions,
     });
 
     const authPolicy = createCommunicationAuthPolicy(credential);
@@ -126,7 +124,7 @@ export class CommunicationRelayClient {
       options;
 
     if (options !== "undefined") {
-      requestOptions.id =  options.id;
+      requestOptions.id = options.id;
       requestOptions.routeType = options.routeType;
       requestOptions.ttl = options.ttl;
     }
@@ -137,7 +135,7 @@ export class CommunicationRelayClient {
     );
 
     try {
-      return await this.client.communicationNetworkTraversal.issueRelayConfiguration( 
+      return await this.client.communicationNetworkTraversal.issueRelayConfiguration(
         updatedOptions
       );
     } catch (e) {
